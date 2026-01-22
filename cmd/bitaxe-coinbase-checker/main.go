@@ -43,7 +43,14 @@ func main() {
 	// Connect to each address
 	g, ctx := errgroup.WithContext(ctx)
 
-	addresses := strings.Split(*flagAddresses, ",")
+	var addresses []string
+	if *flagAddresses != "" {
+		addresses = strings.Split(*flagAddresses, ",")
+	}
+	if len(addresses) == 0 {
+		log.Fatal("ERROR: no miner addresses specified, use -addresses")
+		return
+	}
 
 	var expectedAddresses []string
 	if exp := *flagExpected; exp != "" {
