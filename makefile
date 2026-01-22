@@ -16,7 +16,7 @@ endif
 build:
 	go build -o bin/bitaxe-coinbase-checker ./cmd/bitaxe-coinbase-checker
 
-.PHONY: docker docekr-push
+.PHONY: docker docker-push
 docker:
 	docker build -t adamdecaf/bitaxe-coinbase-checker:${VERSION} .
 
