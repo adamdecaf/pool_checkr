@@ -2,6 +2,10 @@
 
 monitor mining.notify stratum logs for coinbase information
 
+## Getting started
+
+Pull the source code down and build the Go binary [or use a docker image](https://hub.docker.com/r/adamdecaf/bitaxe-coinbase-checker).
+
 ## Usage
 
 pool_checkr offers a Go binary and docker image for running.
