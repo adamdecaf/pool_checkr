@@ -14,6 +14,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/adamdecaf/pool_checkr/internal/notify"
 	"github.com/adamdecaf/pool_checkr/pkg/mining_notify"
 
 	"github.com/gorilla/websocket"
@@ -91,7 +92,8 @@ func parseLogsForMiningNotify(ctx context.Context, expectedInspections int, addr
 		port = "80"
 	}
 
-	address := fmt.Sprintf("ws://%s:%s/api/ws", host, port)
+	workerAddress := net.JoinHostPort(host, port)
+	address := fmt.Sprintf("ws://%s/api/ws", workerAddress)
 	log.Printf("INFO: connecting to %s", address)
 
 	c, _, err := websocket.DefaultDialer.Dial(address, nil)
@@ -131,7 +133,7 @@ func parseLogsForMiningNotify(ctx context.Context, expectedInspections int, addr
 		// Parse mining.notify lines
 		if strings.Contains(line, "mining.notify") {
 			remainingInspections--
-			parseMiningNotifyLine(line, expectedAddresses)
+			parseMiningNotifyLine(workerAddress, line, expectedAddresses)
 		}
 
 		// After the expected number of inspections quit
@@ -151,7 +153,7 @@ func parseLogsForMiningNotify(ctx context.Context, expectedInspections int, addr
 	return nil
 }
 
-func parseMiningNotifyLine(line string, expectedAddresses []string) {
+func parseMiningNotifyLine(worker string, line string, expectedAddresses []string) {
 	start := strings.Index(line, "{")
 	end := strings.LastIndex(line, "}")
 
@@ -195,9 +197,31 @@ func parseMiningNotifyLine(line string, expectedAddresses []string) {
 					for missing := range missingAddresses {
 						log.Printf("ERROR: %s was not found in coinbase", missing)
 					}
+
+					notifyAboutMissingAddresses(worker, missingAddresses)
 					os.Exit(1)
 				}
 			}
+		}
+	}
+}
+
+func notifyAboutMissingAddresses(worker string, missingAddresses map[string]bool) {
+	conf := notify.DefaultConfig()
+
+	var buf strings.Builder
+	buf.WriteString(fmt.Sprintf("missing %d addresses from coinbase output on %s\n", len(missingAddresses), worker))
+	buf.WriteString("\n")
+
+	for missing := range missingAddresses {
+		buf.WriteString(fmt.Sprintf("%s\n", missing))
+	}
+
+	msg := notify.DefaultMessage(buf.String())
+	if msg != nil {
+		err := notify.Send(conf, *msg)
+		if err != nil {
+			log.Fatalf("ERROR: sending notification: %v", err)
 		}
 	}
 }
