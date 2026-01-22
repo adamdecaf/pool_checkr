@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+env:
+  RELEASE: yes
+
 permissions:
   contents: write
   packages: write
