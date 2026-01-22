@@ -176,7 +176,7 @@ func parseMiningNotifyLine(line string, expectedAddresses []string) {
 
 				case len(missingAddresses) > 0:
 					log.Printf("ERROR: missing %d addresses from coinbase output", len(missingAddresses))
-					for missing, _ := range missingAddresses {
+					for missing := range missingAddresses {
 						log.Printf("ERROR: %s was not found in coinbase", missing)
 					}
 					os.Exit(1)
