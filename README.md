@@ -31,7 +31,7 @@ docker run adamdecaf/bitaxe-coinbase-checker:v0.2.1 -addresses <ip:port> -expect
 
 # Credits
 
-Shoudout to [skot's pool_checkr](https://github.com/skot/pool_checkr) repository for the inspiration to learn and realize `mining.notify` can be easily parsed.
+Shoutout to [skot's pool_checkr](https://github.com/skot/pool_checkr) repository and [web version](https://skot.github.io/pool_checkr/) for the inspiration to learn and realize `mining.notify` can be easily parsed.
 
 # License
 
