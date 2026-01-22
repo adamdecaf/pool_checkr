@@ -23,6 +23,8 @@ import (
 var (
 	flagAddresses = flag.String("addresses", "", "Comma separated list of IP:port addresses")
 	flagExpected  = flag.String("expected", "", "Comma separated list of address that expect payouts")
+
+	flagCount = flag.Int("count", 0, "Number of mining.notify logs to inspect")
 )
 
 func main() {
@@ -59,7 +61,7 @@ func main() {
 
 	for _, addr := range addresses {
 		g.Go(func() error {
-			err := parseLogsForMiningNotify(ctx, strings.TrimSpace(addr), expectedAddresses)
+			err := parseLogsForMiningNotify(ctx, *flagCount, strings.TrimSpace(addr), expectedAddresses)
 			if err != nil {
 				return fmt.Errorf("parsing logs from %s failed: %w", addr, err)
 			}
@@ -73,7 +75,7 @@ func main() {
 	}
 }
 
-func parseLogsForMiningNotify(ctx context.Context, addr string, expectedAddresses []string) error {
+func parseLogsForMiningNotify(ctx context.Context, expectedInspections int, addr string, expectedAddresses []string) error {
 	host, port, err := net.SplitHostPort(addr)
 	if err != nil {
 		switch {
@@ -116,6 +118,7 @@ func parseLogsForMiningNotify(ctx context.Context, addr string, expectedAddresse
 	scanner := bufio.NewScanner(reader)
 	scanner.Split(bufio.ScanLines)
 
+	remainingInspections := max(expectedInspections, 1)
 	for scanner.Scan() {
 		line := scanner.Text()
 
@@ -127,7 +130,13 @@ func parseLogsForMiningNotify(ctx context.Context, addr string, expectedAddresse
 
 		// Parse mining.notify lines
 		if strings.Contains(line, "mining.notify") {
+			remainingInspections--
 			parseMiningNotifyLine(line, expectedAddresses)
+		}
+
+		// After the expected number of inspections quit
+		if remainingInspections == 0 {
+			break
 		}
 	}
 

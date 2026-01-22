@@ -16,6 +16,16 @@ pool_checkr offers a Go binary and docker image for running.
 go run ./cmd/bitaxe-coinbase-checker -addresses 192.168.12.52
 ```
 ```
+$ bitaxe-coinbase-checker -help
+Usage of bitaxe-coinbase-checker:
+  -addresses string
+    	Comma separated list of IP:port addresses
+  -count int
+    	Number of mining.notify logs to inspect
+  -expected string
+    	Comma separated list of address that expect payouts
+```
+```
 2026/01/22 11:35:51 INFO: connecting to ws://192.168.12.52:80/api/ws
 2026/01/22 11:35:55 INFO: height=933400 has 2 coinbase outputs
 2026/01/22 11:35:55 INFO: bc1qce93hy5rhg02s6aeu7mfdvxg76x66pqqtrvzs3 (P2WPKH) receives 3.13710696 BTC
