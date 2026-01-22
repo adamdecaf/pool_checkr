@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ccoveille/go-safecast/v2"
 	"github.com/mrtnetwork/bitcoin/address"
 )
 
@@ -125,7 +126,11 @@ func Parse(input string) (*ParsedNotify, error) {
 
 	// Parse nTime
 	if t, err := strconv.ParseUint(result.NTime, 16, 64); err == nil && t > 1e9 {
-		result.NTimeParsed = time.Unix(int64(t), 0).UTC()
+		tt, err := safecast.Convert[int64](t)
+		if err != nil {
+			return nil, fmt.Errorf("nTime %d overflows int64", t)
+		}
+		result.NTimeParsed = time.Unix(tt, 0).UTC()
 	}
 
 	return result, nil

@@ -3,6 +3,7 @@ module github.com/adamdecaf/pool_checkr
 go 1.25.5
 
 require (
+	github.com/ccoveille/go-safecast/v2 v2.0.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/mrtnetwork/bitcoin v1.0.0
 	github.com/stretchr/testify v1.11.1
